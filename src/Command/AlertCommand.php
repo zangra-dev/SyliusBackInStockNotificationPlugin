@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusBackInStockNotificationPlugin\Command;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Sylius\Component\Channel\Model\ChannelInterface;
 use Sylius\Component\Core\Model\ProductVariantInterface;
@@ -30,18 +31,24 @@ final class AlertCommand extends Command
 
     /** @var LoggerInterface */
     private $logger;
+    /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
 
     public function __construct(
         LoggerInterface $logger,
         SenderInterface $sender,
         AvailabilityCheckerInterface $availabilityChecker,
         RepositoryInterface $backInStockNotificationRepository,
+        EntityManagerInterface $entityManager,
         string $name = null
     ) {
         $this->backInStockNotificationRepository = $backInStockNotificationRepository;
         $this->availabilityChecker = $availabilityChecker;
         $this->sender = $sender;
         $this->logger = $logger;
+        $this->entityManager = $entityManager;
         parent::__construct($name);
     }
 
@@ -56,7 +63,8 @@ final class AlertCommand extends Command
     {
         //I think that this load in the long time can be a bottle necklace
         /** @var SubscriptionInterface $subscription */
-        foreach ($this->backInStockNotificationRepository->findAll() as $subscription) {
+        $subscriptions = $this->backInStockNotificationRepository->findBy(['notify' => false]);
+        foreach ($subscriptions as $subscription) {
             $channel = $subscription->getChannel();
             $productVariant = $subscription->getProductVariant();
             if ($productVariant === null || $channel === null) {
@@ -69,12 +77,15 @@ final class AlertCommand extends Command
                 continue;
             }
 
-            if ($this->availabilityChecker->isStockAvailable($productVariant)) {
+            if ($this->availabilityChecker->isStockAvailable($productVariant) && $productVariant->isEnabled() && $productVariant->getProduct()->isEnabled() ) {
                 $this->sendEmail($subscription, $productVariant, $channel);
-                $this->backInStockNotificationRepository->remove($subscription);
+                $subscription->setNotify(true);
+                $this->entityManager->persist($subscription);
+                //$this->backInStockNotificationRepository->remove($subscription);
             }
         }
 
+        $this->entityManager->flush();
         return 0;
     }
 
