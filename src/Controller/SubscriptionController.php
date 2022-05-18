@@ -140,7 +140,8 @@ final class SubscriptionController extends AbstractController
 
                 return $this->redirect($this->getRefererUrl($request));
             }
-            if ($this->availabilityChecker->isStockAvailable($variant)) {
+
+            if ($this->availabilityChecker->isStockAvailable($variant) && $variant->isAvailable()) {
                 $this->addFlash('error', $this->translator->trans('webgriffe_bisn.form_submission.variant_not_oos'));
 
                 return $this->redirect($this->getRefererUrl($request));
