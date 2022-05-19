@@ -56,7 +56,8 @@ final class AlertCommand extends Command
     {
         $this
             ->setDescription('Send an email to the user if the product is returned in stock')
-            ->setHelp('Check the stock status of the products in the webgriffe_back_in_stock_notification table and send and email to the user if the product is returned in stock');
+            ->setHelp('Check the stock status of the products in the webgriffe_back_in_stock_notification table and send and email to the user if the product is returned in stock')
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -67,7 +68,7 @@ final class AlertCommand extends Command
         foreach ($subscriptions as $subscription) {
             $channel = $subscription->getChannel();
             $productVariant = $subscription->getProductVariant();
-            if ($productVariant === null || $channel === null) {
+            if (null === $productVariant || null === $channel) {
                 $this->backInStockNotificationRepository->remove($subscription);
                 $this->logger->warning(
                     'The back in stock subscription for the product does not have all the information required',
@@ -90,6 +91,7 @@ final class AlertCommand extends Command
         }
 
         $this->entityManager->flush();
+
         return 0;
     }
 

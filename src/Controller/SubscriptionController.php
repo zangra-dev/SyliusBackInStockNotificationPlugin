@@ -84,14 +84,14 @@ final class SubscriptionController extends AbstractController
     public function addAction(Request $request): Response
     {
         $form = $this->createForm(SubscriptionType::class);
-        /** @var string|null $productVariantCode */
+        /** @var null|string $productVariantCode */
         $productVariantCode = $request->query->get('product_variant_code');
         if (is_string($productVariantCode)) {
             $form->setData(['product_variant_code' => $productVariantCode]);
         }
 
         $customer = $this->customerContext->getCustomer();
-        if ($customer !== null && $customer->getEmail() !== null) {
+        if (null !== $customer && null !== $customer->getEmail()) {
             $form->remove('email');
         }
 
@@ -117,9 +117,9 @@ final class SubscriptionController extends AbstractController
                     return $this->redirect($this->getRefererUrl($request));
                 }
                 $subscription->setEmail($email);
-            } elseif ($customer !== null) {
+            } elseif (null !== $customer) {
                 $email = $customer->getEmail();
-                if ($email !== null) {
+                if (null !== $email) {
                     $subscription->setCustomer($customer);
                     $subscription->setEmail($email);
                 } else {
@@ -133,7 +133,7 @@ final class SubscriptionController extends AbstractController
                 return $this->redirect($this->getRefererUrl($request));
             }
 
-            /** @var ProductVariantInterface|null $variant */
+            /** @var null|ProductVariantInterface $variant */
             $variant = $this->productVariantRepository->findOneBy(['code' => $data['product_variant_code']]);
             if (null === $variant) {
                 $this->addFlash('error', $this->translator->trans('webgriffe_bisn.form_submission.variant_not_found'));
@@ -157,7 +157,7 @@ final class SubscriptionController extends AbstractController
                     $this->translator->trans(
                         'webgriffe_bisn.form_submission.already_saved',
                         ['email' => $subscription->getEmail(),
-                        'variant' => $variant->getCode()]
+                            'variant' => $variant->getCode(), ]
                     )
                 );
 
@@ -197,7 +197,7 @@ final class SubscriptionController extends AbstractController
 
     public function deleteAction(Request $request, string $hash): Response
     {
-        /** @var SubscriptionInterface|null $subscription */
+        /** @var null|SubscriptionInterface $subscription */
         $subscription = $this->backInStockNotificationRepository->findOneBy(['hash' => $hash]);
         if (null !== $subscription) {
             $this->backInStockNotificationRepository->remove($subscription);
