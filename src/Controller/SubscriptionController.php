@@ -156,7 +156,8 @@ final class SubscriptionController extends AbstractController
                     'error',
                     $this->translator->trans(
                         'webgriffe_bisn.form_submission.already_saved',
-                        ['email' => $subscription->getEmail()]
+                        ['email' => $subscription->getEmail(),
+                        'variant' => $variant->getCode()]
                     )
                 );
 
@@ -182,15 +183,6 @@ final class SubscriptionController extends AbstractController
             $subscription->setHash($hash);
 
             $this->backInStockNotificationRepository->add($subscription);
-            $this->sender->send(
-                'webgriffe_back_in_stock_notification_success_subscription',
-                [$subscription->getEmail()],
-                [
-                    'subscription' => $subscription,
-                    'channel' => $subscription->getChannel(),
-                    'localeCode' => $subscription->getLocaleCode(),
-                ]
-            );
 
             $this->addFlash('success', $this->translator->trans('webgriffe_bisn.form_submission.subscription_successfully'));
 
