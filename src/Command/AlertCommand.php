@@ -116,15 +116,37 @@ final class AlertCommand extends Command
 
     private function sendEmail(SubscriptionInterface $subscription, ProductVariantInterface $productVariant, ChannelInterface $channel): void
     {
-        $this->sender->send(
-            'webgriffe_back_in_stock_notification_alert',
-            [$subscription->getEmail()],
-            [
+
+        $locale = $subscription->getLocaleCode();
+
+        $subject = $this->translator->trans(
+            'webgriffe_bisn.alert_email.alert_title',
+            [],
+            'messages',
+            $locale
+        );
+        $customer = $subscription->getCustomer();
+        if (!is_null($customer)) {
+            $firstName = $customer->getFirstName();
+        }
+        else {
+            $firstName = '';
+        }
+        $email = (new TemplatedEmail())
+            ->from(new Address('no-reply@zangra.com', 'zangra'))
+            ->to(new Address($subscription->getEmail(),$firstName))
+            ->bcc(new Address('admin@zangra.com', 'zangra'))
+            ->subject($subject)
+            ->htmlTemplate('@SyliusAdmin/Email/backInStock.html.twig')
+            ->context([
                 'subscription' => $subscription,
                 'product' => $productVariant->getProduct(),
+                'variant' => $productVariant,
                 'channel' => $channel,
                 'localeCode' => $subscription->getLocaleCode(),
-            ]
-        );
+            ])
+        ;
+
+        $this->mailer->send($email);
     }
 }
