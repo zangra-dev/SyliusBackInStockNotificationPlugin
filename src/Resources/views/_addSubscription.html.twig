@@ -2,7 +2,7 @@
     <div id="product-subscription" style="display: none;">
         {{ render(url('webgriffe_back_in_stock_notification_add_subscription')) }}
     </div>
-{% elseif product.isSimple and (not product.variants.first.isInStock and not product.variants.first.availableOnDemand and not product.variants.first.isAvailable)
+{% elseif product.isSimple and (not product.variants.first.isInStock and not product.variants.first.availableOnDemand or not product.variants.first.isAvailable)
     and product.variants.first.isTracked %}
     {{ render(url('webgriffe_back_in_stock_notification_add_subscription', {'product_variant_code': product.variants.first.code})) }}
 {% endif %}
