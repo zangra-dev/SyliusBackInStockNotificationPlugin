@@ -30,7 +30,7 @@ webgriffe_bisn:
         subscription_unsub: 'Were not you the one who subscribed to these notifications? <a href="{url}" target="_blank">Click here</a> to delete yourself.'
     alert_email:
         alert_title: 'Product available again'
-        alert_message: 'We inform you that the product {product} is back in stock'
+        alert_message: 'We inform you that the product {product} ( {variantCode} ) is back in stock'
         alert_action: 'Buy now'
     admin:
         subscriptions_subtitle: 'Manage user subscriptions'
