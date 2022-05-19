@@ -11,9 +11,13 @@ use Sylius\Component\Core\Model\ProductVariantInterface;
 use Sylius\Component\Inventory\Checker\AvailabilityCheckerInterface;
 use Sylius\Component\Mailer\Sender\SenderInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Webgriffe\SyliusBackInStockNotificationPlugin\Entity\SubscriptionInterface;
 
 final class AlertCommand extends Command
@@ -31,10 +35,21 @@ final class AlertCommand extends Command
 
     /** @var LoggerInterface */
     private $logger;
+
+    /**
+     * @var MailerInterface
+     */
+    private $mailer;
+
     /**
      * @var EntityManagerInterface
      */
     private $entityManager;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
 
     public function __construct(
         LoggerInterface $logger,
@@ -42,6 +57,8 @@ final class AlertCommand extends Command
         AvailabilityCheckerInterface $availabilityChecker,
         RepositoryInterface $backInStockNotificationRepository,
         EntityManagerInterface $entityManager,
+        MailerInterface $mailer,
+        TranslatorInterface $translator,
         string $name = null
     ) {
         $this->backInStockNotificationRepository = $backInStockNotificationRepository;
@@ -49,6 +66,8 @@ final class AlertCommand extends Command
         $this->sender = $sender;
         $this->logger = $logger;
         $this->entityManager = $entityManager;
+        $this->mailer = $mailer;
+        $this->translator = $translator;
         parent::__construct($name);
     }
 
