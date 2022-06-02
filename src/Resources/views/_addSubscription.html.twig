@@ -1,5 +1,5 @@
 {% if product.isConfigurable %}
-    <div id="product-subscription" style="display: none;">
+    <div id="product-subscription">
         {{ render(url('webgriffe_back_in_stock_notification_add_subscription')) }}
     </div>
 {% elseif product.isSimple and (not product.variants.first.isInStock and not product.variants.first.availableOnDemand or not product.variants.first.isAvailable)
