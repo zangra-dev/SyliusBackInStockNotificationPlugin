@@ -136,7 +136,7 @@ final class AlertCommand extends Command
             ->from(new Address('no-reply@zangra.com', 'zangra'))
             ->to(new Address($subscription->getEmail(),$firstName))
             ->bcc(new Address('admin@zangra.com', 'zangra'))
-            ->subject($subject)
+            ->subject('📦 ' . $subject)
             ->htmlTemplate('@SyliusAdmin/Email/backInStock.html.twig')
             ->context([
                 'subscription' => $subscription,
