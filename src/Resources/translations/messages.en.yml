@@ -22,7 +22,7 @@ webgriffe_bisn:
         actions: 'Action'
         simple: 'Simple product'
     product_page:
-        stock_notify_title: 'Get an email notification when the product return in stock'
+        stock_notify_title: 'Get an email notification <br> when the product return in stock'
         form_action: 'Notify me'
     subscription_mail:
         subscription_title: 'Product not available'

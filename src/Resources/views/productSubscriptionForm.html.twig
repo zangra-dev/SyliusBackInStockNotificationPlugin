@@ -1,9 +1,8 @@
 {% form_theme form '@SyliusShop/Form/theme.html.twig' %}
 <div class="ui segment">
-    <br>
-    <button class="button row">
-        {{ 'webgriffe_bisn.product_page.stock_notify_title'|trans }}
-    </button>
+    <div class="breadcrumb">
+        {{ 'webgriffe_bisn.product_page.stock_notify_title'|trans|raw }}
+    </div>
     {{ form_start(form, {'attr': {'class': 'ui form form-default', 'id': 'back_in_stock_not'}, 'action': path('webgriffe_back_in_stock_notification_add_subscription')}) }}
     {% if form.email is defined %}
         {{ form_widget(form.email, {'attr': {'data-test-fill-subscription-form-whit-my-email':'', 'class' : 'input m1', 'placeholder': 'Email'}}) }}
