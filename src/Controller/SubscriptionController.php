@@ -157,17 +157,24 @@ final class SubscriptionController extends AbstractController
             $subscriptionSaved = $this->backInStockNotificationRepository->findOneBy(
                 ['email' => $subscription->getEmail(), 'productVariant' => $subscription->getProductVariant()]
             );
-            if ($subscriptionSaved) {
-                $this->addFlash(
-                    'error',
-                    $this->translator->trans(
-                        'webgriffe_bisn.form_submission.already_saved',
-                        ['email' => $subscription->getEmail(),
-                            'variant' => $variant->getCode(), ]
-                    )
-                );
 
-                return $this->redirect($this->getRefererUrl($request));
+            if ($subscriptionSaved) {
+                if(!$subscriptionSaved->isNotify()) {
+                    $this->addFlash(
+                        'error',
+                        $this->translator->trans(
+                            'webgriffe_bisn.form_submission.already_saved',
+                            ['email' => $subscription->getEmail(),
+                                'variant' => $variant->getCode(),]
+                        )
+                    );
+                    return $this->redirect($this->getRefererUrl($request));
+                } else {
+                    $subscriptionSaved->setNotify(false);
+                    $this->addFlash('success', $this->translator->trans('webgriffe_bisn.form_submission.subscription_successfully'));
+                    $this->backInStockNotificationRepository->add($subscriptionSaved);
+                    return $this->redirect($this->getRefererUrl($request));
+                }
             }
 
             $currentChannel = $this->channelContext->getChannel();
