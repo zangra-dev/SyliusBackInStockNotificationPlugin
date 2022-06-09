@@ -1,7 +1,7 @@
 webgriffe_bisn:
     form_submission:
         invalid_form: 'Error during form submitting, please try again'
-        invalid_email: 'Error during form submitting, please check email syntax'
+        invalid_email: 'Error during form submitting, please check email syntax (email)'
         variant_not_found: 'Product not found, it is not possible to subscribe to notifications'
         variant_not_oos: 'Product in stock, it is not possible to subscribe to notifications'
         already_saved: 'Subscription with the mail email is already present for variant'
@@ -22,7 +22,7 @@ webgriffe_bisn:
         actions: 'Action'
         simple: 'Simple product'
     product_page:
-        stock_notify_title: 'Get an email notification <br> when the product return in stock'
+        stock_notify_title: 'Get notified if this product<br>comes back in stock'
         form_action: 'Notify me'
     subscription_mail:
         subscription_title: 'Product not available'
@@ -30,8 +30,8 @@ webgriffe_bisn:
         subscription_unsub: 'Were not you the one who subscribed to these notifications? <a href="{url}" target="_blank">Click here</a> to delete yourself.'
     alert_email:
         alert_title: 'Product back in stock'
-        alert_message: 'We inform you that the product {product} ({variantCode}) is back in stock'
-        alert_action: 'Buy now'
+        alert_message: 'We inform you that the product <b>{product}</b> ({variantCode}) is back in stock'
+        alert_action: Don't miss out!
     admin:
         subscriptions_subtitle: 'Manage user subscriptions'
         menu_label: 'Products notification'

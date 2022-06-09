@@ -113,7 +113,13 @@ final class SubscriptionController extends AbstractController
                 $errors = $this->validator->validate($email, [new Email(), new NotBlank()]);
                 if (count($errors) > 0) {
                     $this->addFlash('error', $this->translator->trans('webgriffe_bisn.form_submission.invalid_email'));
-
+                    $this->addFlash(
+                        'error',
+                        $this->translator->trans(
+                            'webgriffe_bisn.form_submission.invalid_email',
+                            ['email' => $email]
+                        )
+                    );
                     return $this->redirect($this->getRefererUrl($request));
                 }
                 $subscription->setEmail($email);
