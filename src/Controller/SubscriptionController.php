@@ -8,6 +8,7 @@ use DateTime;
 use Exception;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Sylius\Component\Core\Model\ProductVariantInterface;
+use Sylius\Component\Core\Repository\CustomerRepositoryInterface;
 use Sylius\Component\Core\Repository\ProductVariantRepositoryInterface;
 use Sylius\Component\Customer\Context\CustomerContextInterface;
 use Sylius\Component\Inventory\Checker\AvailabilityCheckerInterface;
@@ -57,6 +58,9 @@ final class SubscriptionController extends AbstractController
     /** @var ChannelContextInterface */
     private $channelContext;
 
+    /** @var CustomerRepositoryInterface */
+    private $customerRepository;
+
     public function __construct(
         ChannelContextInterface $channelContext,
         TranslatorInterface $translator,
@@ -67,7 +71,8 @@ final class SubscriptionController extends AbstractController
         SenderInterface $sender,
         LocaleContextInterface $localeContext,
         RepositoryInterface $backInStockNotificationRepository,
-        FactoryInterface $backInStockNotificationFactory
+        FactoryInterface $backInStockNotificationFactory,
+        CustomerRepositoryInterface $customerRepository
     ) {
         $this->backInStockNotificationRepository = $backInStockNotificationRepository;
         $this->backInStockNotificationFactory = $backInStockNotificationFactory;
@@ -79,6 +84,7 @@ final class SubscriptionController extends AbstractController
         $this->validator = $validator;
         $this->translator = $translator;
         $this->channelContext = $channelContext;
+        $this->customerRepository = $customerRepository;
     }
 
     public function addAction(Request $request): Response

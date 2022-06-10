@@ -23,6 +23,7 @@ services:
       - '@sylius.context.locale'
       - '@webgriffe.repository.back_in_stock_notification_subscription'
       - '@webgriffe.factory.back_in_stock_notification_subscription'
+      - '@sylius.repository.customer'
 
   Webgriffe\SyliusBackInStockNotificationPlugin\Menu\AccountMenuListener:
     tags:
