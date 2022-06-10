@@ -96,10 +96,12 @@ final class AlertCommand extends Command
 
                 continue;
             }
+            if(!$productVariant->isEnabled() || !$productVariant->getProduct()->isEnabled()) {
+                $this->backInStockNotificationRepository->remove($subscription);
+                continue;
+            }
 
             if ($this->availabilityChecker->isStockAvailable($productVariant)
-                && $productVariant->isEnabled()
-                && $productVariant->getProduct()->isEnabled()
                 && $productVariant->isAvailable()
             ) {
                 $this->sendEmail($subscription, $productVariant, $channel);
