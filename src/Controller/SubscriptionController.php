@@ -128,6 +128,10 @@ final class SubscriptionController extends AbstractController
                     );
                     return $this->redirect($this->getRefererUrl($request));
                 }
+                $customer = $this->customerRepository->findOneBy(['email' => $email]);
+                if (!is_null($customer)) {
+                    $subscription->setCustomer($customer);
+                }
                 $subscription->setEmail($email);
             } elseif (null !== $customer) {
                 $email = $customer->getEmail();
