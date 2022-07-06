@@ -100,6 +100,7 @@ final class SubscriptionController extends AbstractController
         if (null !== $customer && null !== $customer->getEmail()) {
             $form->remove('email');
         }
+        $spam = $request->request->get("customer_email");
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && !$form->isValid()) {
@@ -108,7 +109,7 @@ final class SubscriptionController extends AbstractController
             return $this->redirect($this->getRefererUrl($request));
         }
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if (empty($spam) && $form->isSubmitted() && $form->isValid()) {
             /** @var array $data */
             $data = $form->getData();
             /** @var SubscriptionInterface $subscription */
