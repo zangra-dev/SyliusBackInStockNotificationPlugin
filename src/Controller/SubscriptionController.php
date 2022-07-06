@@ -8,6 +8,7 @@ use DateTime;
 use Exception;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Sylius\Component\Core\Model\ProductVariantInterface;
+use Sylius\Component\Core\Repository\CustomerRepositoryInterface;
 use Sylius\Component\Core\Repository\ProductVariantRepositoryInterface;
 use Sylius\Component\Customer\Context\CustomerContextInterface;
 use Sylius\Component\Inventory\Checker\AvailabilityCheckerInterface;
@@ -57,6 +58,9 @@ final class SubscriptionController extends AbstractController
     /** @var ChannelContextInterface */
     private $channelContext;
 
+    /** @var CustomerRepositoryInterface */
+    private $customerRepository;
+
     public function __construct(
         ChannelContextInterface $channelContext,
         TranslatorInterface $translator,
@@ -67,7 +71,8 @@ final class SubscriptionController extends AbstractController
         SenderInterface $sender,
         LocaleContextInterface $localeContext,
         RepositoryInterface $backInStockNotificationRepository,
-        FactoryInterface $backInStockNotificationFactory
+        FactoryInterface $backInStockNotificationFactory,
+        CustomerRepositoryInterface $customerRepository
     ) {
         $this->backInStockNotificationRepository = $backInStockNotificationRepository;
         $this->backInStockNotificationFactory = $backInStockNotificationFactory;
@@ -79,19 +84,20 @@ final class SubscriptionController extends AbstractController
         $this->validator = $validator;
         $this->translator = $translator;
         $this->channelContext = $channelContext;
+        $this->customerRepository = $customerRepository;
     }
 
     public function addAction(Request $request): Response
     {
         $form = $this->createForm(SubscriptionType::class);
-        /** @var string|null $productVariantCode */
+        /** @var null|string $productVariantCode */
         $productVariantCode = $request->query->get('product_variant_code');
         if (is_string($productVariantCode)) {
             $form->setData(['product_variant_code' => $productVariantCode]);
         }
 
         $customer = $this->customerContext->getCustomer();
-        if ($customer !== null && $customer->getEmail() !== null) {
+        if (null !== $customer && null !== $customer->getEmail()) {
             $form->remove('email');
         }
 
@@ -113,13 +119,23 @@ final class SubscriptionController extends AbstractController
                 $errors = $this->validator->validate($email, [new Email(), new NotBlank()]);
                 if (count($errors) > 0) {
                     $this->addFlash('error', $this->translator->trans('webgriffe_bisn.form_submission.invalid_email'));
-
+                    $this->addFlash(
+                        'error',
+                        $this->translator->trans(
+                            'webgriffe_bisn.form_submission.invalid_email',
+                            ['email' => $email]
+                        )
+                    );
                     return $this->redirect($this->getRefererUrl($request));
                 }
+                $customer = $this->customerRepository->findOneBy(['email' => $email]);
+                if (!is_null($customer)) {
+                    $subscription->setCustomer($customer);
+                }
                 $subscription->setEmail($email);
-            } elseif ($customer !== null) {
+            } elseif (null !== $customer) {
                 $email = $customer->getEmail();
-                if ($email !== null) {
+                if (null !== $email) {
                     $subscription->setCustomer($customer);
                     $subscription->setEmail($email);
                 } else {
@@ -133,14 +149,15 @@ final class SubscriptionController extends AbstractController
                 return $this->redirect($this->getRefererUrl($request));
             }
 
-            /** @var ProductVariantInterface|null $variant */
+            /** @var null|ProductVariantInterface $variant */
             $variant = $this->productVariantRepository->findOneBy(['code' => $data['product_variant_code']]);
             if (null === $variant) {
                 $this->addFlash('error', $this->translator->trans('webgriffe_bisn.form_submission.variant_not_found'));
 
                 return $this->redirect($this->getRefererUrl($request));
             }
-            if ($this->availabilityChecker->isStockAvailable($variant)) {
+
+            if ($this->availabilityChecker->isStockAvailable($variant) && $variant->isAvailable()) {
                 $this->addFlash('error', $this->translator->trans('webgriffe_bisn.form_submission.variant_not_oos'));
 
                 return $this->redirect($this->getRefererUrl($request));
@@ -150,16 +167,24 @@ final class SubscriptionController extends AbstractController
             $subscriptionSaved = $this->backInStockNotificationRepository->findOneBy(
                 ['email' => $subscription->getEmail(), 'productVariant' => $subscription->getProductVariant()]
             );
-            if ($subscriptionSaved) {
-                $this->addFlash(
-                    'error',
-                    $this->translator->trans(
-                        'webgriffe_bisn.form_submission.already_saved',
-                        ['email' => $subscription->getEmail()]
-                    )
-                );
 
-                return $this->redirect($this->getRefererUrl($request));
+            if ($subscriptionSaved) {
+                if(!$subscriptionSaved->isNotify()) {
+                    $this->addFlash(
+                        'error',
+                        $this->translator->trans(
+                            'webgriffe_bisn.form_submission.already_saved',
+                            ['email' => $subscription->getEmail(),
+                                'variant' => $variant->getCode(),]
+                        )
+                    );
+                    return $this->redirect($this->getRefererUrl($request));
+                } else {
+                    $subscriptionSaved->setNotify(false);
+                    $this->addFlash('success', $this->translator->trans('webgriffe_bisn.form_submission.subscription_successfully'));
+                    $this->backInStockNotificationRepository->add($subscriptionSaved);
+                    return $this->redirect($this->getRefererUrl($request));
+                }
             }
 
             $currentChannel = $this->channelContext->getChannel();
@@ -181,15 +206,6 @@ final class SubscriptionController extends AbstractController
             $subscription->setHash($hash);
 
             $this->backInStockNotificationRepository->add($subscription);
-            $this->sender->send(
-                'webgriffe_back_in_stock_notification_success_subscription',
-                [$subscription->getEmail()],
-                [
-                    'subscription' => $subscription,
-                    'channel' => $subscription->getChannel(),
-                    'localeCode' => $subscription->getLocaleCode(),
-                ]
-            );
 
             $this->addFlash('success', $this->translator->trans('webgriffe_bisn.form_submission.subscription_successfully'));
 
@@ -204,7 +220,7 @@ final class SubscriptionController extends AbstractController
 
     public function deleteAction(Request $request, string $hash): Response
     {
-        /** @var SubscriptionInterface|null $subscription */
+        /** @var null|SubscriptionInterface $subscription */
         $subscription = $this->backInStockNotificationRepository->findOneBy(['hash' => $hash]);
         if (null !== $subscription) {
             $this->backInStockNotificationRepository->remove($subscription);

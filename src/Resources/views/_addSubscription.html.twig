@@ -1,7 +1,8 @@
 {% if product.isConfigurable %}
-    <div id="notification-overlay" class="ui modal">
+    <div id="product-subscription">
         {{ render(url('webgriffe_back_in_stock_notification_add_subscription')) }}
     </div>
-{% elseif product.isSimple and not product.variants.first.isInStock and product.variants.first.isTracked %}
+{% elseif product.isSimple and (not product.variants.first.isInStock and not product.variants.first.availableOnDemand or not product.variants.first.isAvailable)
+    and product.variants.first.isTracked %}
     {{ render(url('webgriffe_back_in_stock_notification_add_subscription', {'product_variant_code': product.variants.first.code})) }}
 {% endif %}

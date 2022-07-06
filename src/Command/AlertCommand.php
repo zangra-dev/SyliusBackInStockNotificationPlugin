@@ -11,9 +11,13 @@ use Sylius\Component\Core\Model\ProductVariantInterface;
 use Sylius\Component\Inventory\Checker\AvailabilityCheckerInterface;
 use Sylius\Component\Mailer\Sender\SenderInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Webgriffe\SyliusBackInStockNotificationPlugin\Entity\SubscriptionInterface;
 
 final class AlertCommand extends Command
@@ -31,10 +35,21 @@ final class AlertCommand extends Command
 
     /** @var LoggerInterface */
     private $logger;
+
+    /**
+     * @var MailerInterface
+     */
+    private $mailer;
+
     /**
      * @var EntityManagerInterface
      */
     private $entityManager;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
 
     public function __construct(
         LoggerInterface $logger,
@@ -42,6 +57,8 @@ final class AlertCommand extends Command
         AvailabilityCheckerInterface $availabilityChecker,
         RepositoryInterface $backInStockNotificationRepository,
         EntityManagerInterface $entityManager,
+        MailerInterface $mailer,
+        TranslatorInterface $translator,
         string $name = null
     ) {
         $this->backInStockNotificationRepository = $backInStockNotificationRepository;
@@ -49,6 +66,8 @@ final class AlertCommand extends Command
         $this->sender = $sender;
         $this->logger = $logger;
         $this->entityManager = $entityManager;
+        $this->mailer = $mailer;
+        $this->translator = $translator;
         parent::__construct($name);
     }
 
@@ -56,7 +75,8 @@ final class AlertCommand extends Command
     {
         $this
             ->setDescription('Send an email to the user if the product is returned in stock')
-            ->setHelp('Check the stock status of the products in the webgriffe_back_in_stock_notification table and send and email to the user if the product is returned in stock');
+            ->setHelp('Check the stock status of the products in the webgriffe_back_in_stock_notification table and send and email to the user if the product is returned in stock')
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -67,7 +87,7 @@ final class AlertCommand extends Command
         foreach ($subscriptions as $subscription) {
             $channel = $subscription->getChannel();
             $productVariant = $subscription->getProductVariant();
-            if ($productVariant === null || $channel === null) {
+            if (null === $productVariant || null === $channel) {
                 $this->backInStockNotificationRepository->remove($subscription);
                 $this->logger->warning(
                     'The back in stock subscription for the product does not have all the information required',
@@ -76,8 +96,14 @@ final class AlertCommand extends Command
 
                 continue;
             }
+            if(!$productVariant->isEnabled() || !$productVariant->getProduct()->isEnabled()) {
+                $this->backInStockNotificationRepository->remove($subscription);
+                continue;
+            }
 
-            if ($this->availabilityChecker->isStockAvailable($productVariant) && $productVariant->isEnabled() && $productVariant->getProduct()->isEnabled() ) {
+            if ($this->availabilityChecker->isStockAvailable($productVariant)
+                && $productVariant->isAvailable()
+            ) {
                 $this->sendEmail($subscription, $productVariant, $channel);
                 $subscription->setNotify(true);
                 $this->entityManager->persist($subscription);
@@ -86,20 +112,43 @@ final class AlertCommand extends Command
         }
 
         $this->entityManager->flush();
+
         return 0;
     }
 
     private function sendEmail(SubscriptionInterface $subscription, ProductVariantInterface $productVariant, ChannelInterface $channel): void
     {
-        $this->sender->send(
-            'webgriffe_back_in_stock_notification_alert',
-            [$subscription->getEmail()],
-            [
+
+        $locale = $subscription->getLocaleCode();
+
+        $subject = $this->translator->trans(
+            'webgriffe_bisn.alert_email.alert_title',
+            [],
+            'messages',
+            $locale
+        );
+        $customer = $subscription->getCustomer();
+        if (!is_null($customer)) {
+            $firstName = $customer->getFirstName();
+        }
+        else {
+            $firstName = '';
+        }
+        $email = (new TemplatedEmail())
+            ->from(new Address('no-reply@zangra.com', 'zangra'))
+            ->to(new Address($subscription->getEmail(),$firstName))
+            ->bcc(new Address('admin@zangra.com', 'zangra'))
+            ->subject('📦 ' . $subject)
+            ->htmlTemplate('@SyliusAdmin/Email/backInStock.html.twig')
+            ->context([
                 'subscription' => $subscription,
                 'product' => $productVariant->getProduct(),
+                'variant' => $productVariant,
                 'channel' => $channel,
                 'localeCode' => $subscription->getLocaleCode(),
-            ]
-        );
+            ])
+        ;
+
+        $this->mailer->send($email);
     }
 }
