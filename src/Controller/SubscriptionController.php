@@ -89,6 +89,11 @@ final class SubscriptionController extends AbstractController
 
     public function addAction(Request $request): Response
     {
+        $spam = $request->request->get("customer_email");
+        if (!empty($spam)) {
+            return $this->redirect($this->getRefererUrl($request));
+        }
+
         $form = $this->createForm(SubscriptionType::class);
         /** @var null|string $productVariantCode */
         $productVariantCode = $request->query->get('product_variant_code');
@@ -100,7 +105,6 @@ final class SubscriptionController extends AbstractController
         if (null !== $customer && null !== $customer->getEmail()) {
             $form->remove('email');
         }
-        $spam = $request->request->get("customer_email");
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && !$form->isValid()) {
@@ -109,7 +113,7 @@ final class SubscriptionController extends AbstractController
             return $this->redirect($this->getRefererUrl($request));
         }
 
-        if (empty($spam) && $form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             /** @var array $data */
             $data = $form->getData();
             /** @var SubscriptionInterface $subscription */
