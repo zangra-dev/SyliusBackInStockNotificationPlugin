@@ -10,6 +10,8 @@ services:
 
   Webgriffe\SyliusBackInStockNotificationPlugin\Controller\SubscriptionController:
     tags: ['controller.service_arguments']
+    calls:
+      - [ setContainer, [ '@service_container' ] ]
     arguments:
       - '@sylius.context.channel'
       - '@translator'
