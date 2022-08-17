@@ -105,9 +105,9 @@ final class AlertCommand extends Command
                 && $productVariant->isAvailable()
             ) {
                 $this->sendEmail($subscription, $productVariant, $channel);
-                $subscription->setNotify(true);
-                $this->entityManager->persist($subscription);
-                //$this->backInStockNotificationRepository->remove($subscription);
+                /*$subscription->setNotify(true);
+                $this->entityManager->persist($subscription);*/
+                $this->backInStockNotificationRepository->remove($subscription);
             }
         }
 
