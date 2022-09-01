@@ -139,7 +139,7 @@ final class AlertCommand extends Command
             ->to(new Address($subscription->getEmail(),$firstName))
             ->bcc(new Address('admin@zangra.com', 'zangra'))
             ->subject('📦 ' . $subject)
-            ->htmlTemplate('@SyliusAdmin/Email/backInStock.html.twig')
+            ->htmlTemplate('@SyliusUi/Email/backInStock.html.twig')
             ->context([
                 'subscription' => $subscription,
                 'product' => $productVariant->getProduct(),
