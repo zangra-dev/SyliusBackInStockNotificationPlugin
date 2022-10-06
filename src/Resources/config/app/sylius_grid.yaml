@@ -13,6 +13,9 @@ sylius_grid:
         id: asc
       limits: [100, 25, 50]
       fields:
+        id:
+          type: string
+          label: sylius.ui.id
         image:
           type: twig
           label: sylius.ui.image
