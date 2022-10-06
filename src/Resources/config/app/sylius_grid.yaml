@@ -9,6 +9,9 @@ sylius_grid:
         name: doctrine/orm
         options:
           class: Webgriffe\SyliusBackInStockNotificationPlugin\Entity\Subscription
+      sorting:
+        id: asc
+      limits: [100, 25, 50]
       fields:
         image:
           type: twig
@@ -19,12 +22,11 @@ sylius_grid:
         product_variant_code:
           type: string
           label: sylius.ui.code
-          sortable: ~
+          sortable: productVariant.code
           path: productVariant.code
         name:
           type: string
           label: sylius.ui.name
-          sortable: translation.name
           path: productVariant.product.name
         email:
           type: string
@@ -35,24 +37,20 @@ sylius_grid:
           sortable: createdAt
           options:
             format: d-m-Y H:i:s
-        notify:
-            type: twig
-            label: Notify
-            path: .
-            options:
-                template: "@WebgriffeSyliusBackInStockNotificationPlugin/MyAccount/notifyCell.html.twig"
       filters:
         email:
           type: string
           label: sylius.ui.email
+          form_options:
+            type: contains
         code:
           type: string
           label: sylius.ui.code
           options:
             fields: [productVariant.code]
-        created_at:
-          type: date
-          label: sylius.ui.date
+          form_options:
+            type: contains
+
       actions:
         item:
           product_details:
