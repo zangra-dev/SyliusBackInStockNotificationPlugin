@@ -13,28 +13,28 @@ class Subscription implements SubscriptionInterface
 {
     use TimestampableTrait;
 
-    /** @var int|null */
+    /** @var null|int */
     private $id;
 
-    /** @var string|null */
+    /** @var null|string */
     private $hash;
 
-    /** @var string|null */
+    /** @var null|string */
     private $email;
 
-    /** @var CustomerInterface|null */
+    /** @var null|CustomerInterface */
     private $customer;
 
-    /** @var ProductVariantInterface|null */
+    /** @var null|ProductVariantInterface */
     private $productVariant;
 
-    /** @var ChannelInterface|null */
+    /** @var null|ChannelInterface */
     private $channel;
 
-    /** @var string|null */
+    /** @var null|string */
     private $localeCode;
 
-    /** @var boolean */
+    /** @var bool */
     private $notify = false;
 
     public function getId(): ?int
@@ -102,17 +102,11 @@ class Subscription implements SubscriptionInterface
         $this->email = $email;
     }
 
-    /**
-     * @return bool
-     */
     public function isNotify(): bool
     {
         return $this->notify;
     }
 
-    /**
-     * @param bool $notify
-     */
     public function setNotify(bool $notify): void
     {
         $this->notify = $notify;

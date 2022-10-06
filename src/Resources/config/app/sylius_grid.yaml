@@ -35,6 +35,12 @@ sylius_grid:
           sortable: createdAt
           options:
             format: d-m-Y H:i:s
+        notify:
+            type: twig
+            label: Notify
+            path: .
+            options:
+                template: "@WebgriffeSyliusBackInStockNotificationPlugin/MyAccount/notifyCell.html.twig"
       filters:
         email:
           type: string
