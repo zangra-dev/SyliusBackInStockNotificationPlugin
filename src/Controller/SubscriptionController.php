@@ -89,6 +89,11 @@ final class SubscriptionController extends AbstractController
 
     public function addAction(Request $request): Response
     {
+        $spam = $request->request->get("customer_email");
+        if (!empty($spam)) {
+            return $this->redirect($this->getRefererUrl($request));
+        }
+
         $form = $this->createForm(SubscriptionType::class);
         /** @var null|string $productVariantCode */
         $productVariantCode = $request->query->get('product_variant_code');

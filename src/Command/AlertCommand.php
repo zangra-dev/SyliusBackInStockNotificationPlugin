@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusBackInStockNotificationPlugin\Command;
 
+use App\Component\Mailer\Mail as MailSender;
+use App\Repository\EmailRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Sylius\Component\Channel\Model\ChannelInterface;
@@ -50,6 +52,10 @@ final class AlertCommand extends Command
      * @var TranslatorInterface
      */
     private $translator;
+    /**
+     * @var EmailRepository
+     */
+    private $emailRepository;
 
     public function __construct(
         LoggerInterface $logger,
@@ -68,6 +74,7 @@ final class AlertCommand extends Command
         $this->entityManager = $entityManager;
         $this->mailer = $mailer;
         $this->translator = $translator;
+        $this->emailRepository = $this->entityManager->getRepository('App:Mail\Email');
         parent::__construct($name);
     }
 
@@ -105,9 +112,9 @@ final class AlertCommand extends Command
                 && $productVariant->isAvailable()
             ) {
                 $this->sendEmail($subscription, $productVariant, $channel);
-                $subscription->setNotify(true);
-                $this->entityManager->persist($subscription);
-                //$this->backInStockNotificationRepository->remove($subscription);
+                /*$subscription->setNotify(true);
+                $this->entityManager->persist($subscription);*/
+                $this->backInStockNotificationRepository->remove($subscription);
             }
         }
 
@@ -118,37 +125,8 @@ final class AlertCommand extends Command
 
     private function sendEmail(SubscriptionInterface $subscription, ProductVariantInterface $productVariant, ChannelInterface $channel): void
     {
+        $mailer = new MailSender($this->emailRepository, $this->mailer, null, $this->entityManager);
 
-        $locale = $subscription->getLocaleCode();
-
-        $subject = $this->translator->trans(
-            'webgriffe_bisn.alert_email.alert_title',
-            [],
-            'messages',
-            $locale
-        );
-        $customer = $subscription->getCustomer();
-        if (!is_null($customer)) {
-            $firstName = $customer->getFirstName();
-        }
-        else {
-            $firstName = '';
-        }
-        $email = (new TemplatedEmail())
-            ->from(new Address('no-reply@zangra.com', 'zangra'))
-            ->to(new Address($subscription->getEmail(),$firstName))
-            ->bcc(new Address('admin@zangra.com', 'zangra'))
-            ->subject('📦 ' . $subject)
-            ->htmlTemplate('@SyliusAdmin/Email/backInStock.html.twig')
-            ->context([
-                'subscription' => $subscription,
-                'product' => $productVariant->getProduct(),
-                'variant' => $productVariant,
-                'channel' => $channel,
-                'localeCode' => $subscription->getLocaleCode(),
-            ])
-        ;
-
-        $this->mailer->send($email);
+        $mailer->sendBackInStockEmail($subscription, $productVariant, $channel);
     }
 }
