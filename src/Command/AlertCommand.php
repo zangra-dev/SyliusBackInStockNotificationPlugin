@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusBackInStockNotificationPlugin\Command;
 
-use App\Component\Mailer\Mail as MailSender;
-use App\Repository\EmailRepository;
+use App\Component\Mailer\MailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Sylius\Component\Channel\Model\ChannelInterface;
@@ -25,37 +24,13 @@ use Webgriffe\SyliusBackInStockNotificationPlugin\Entity\SubscriptionInterface;
 final class AlertCommand extends Command
 {
     protected static $defaultName = 'webgriffe:back-in-stock-notification:alert';
-
-    /** @var RepositoryInterface */
-    private $backInStockNotificationRepository;
-
-    /** @var AvailabilityCheckerInterface */
-    private $availabilityChecker;
-
-    /** @var SenderInterface */
-    private $sender;
-
-    /** @var LoggerInterface */
-    private $logger;
-
-    /**
-     * @var MailerInterface
-     */
-    private $mailer;
-
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-    /**
-     * @var EmailRepository
-     */
-    private $emailRepository;
+    private RepositoryInterface $backInStockNotificationRepository;
+    private AvailabilityCheckerInterface $availabilityChecker;
+    private SenderInterface $sender;
+    private LoggerInterface $logger;
+    private MailerInterface $mailer;
+    private EntityManagerInterface $entityManager;
+    private TranslatorInterface $translator;
 
     public function __construct(
         LoggerInterface $logger,
@@ -74,7 +49,6 @@ final class AlertCommand extends Command
         $this->entityManager = $entityManager;
         $this->mailer = $mailer;
         $this->translator = $translator;
-        $this->emailRepository = $this->entityManager->getRepository('App:Mail\Email');
         parent::__construct($name);
     }
 
@@ -125,8 +99,7 @@ final class AlertCommand extends Command
 
     private function sendEmail(SubscriptionInterface $subscription, ProductVariantInterface $productVariant, ChannelInterface $channel): void
     {
-        $mailer = new MailSender($this->emailRepository, $this->mailer, null, $this->entityManager);
-
+        $mailer = new MailService($this->mailer, $this->entityManager, null);
         $mailer->sendBackInStockEmail($subscription, $productVariant, $channel);
     }
 }
