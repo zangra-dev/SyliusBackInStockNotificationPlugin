@@ -23,8 +23,6 @@
 
         <field name="notify" column="notify" type="boolean" nullable="false"/>
 
-        <field name="notify" column="notify" type="boolean" nullable="false" />
-
         <many-to-one field="customer" target-entity="Sylius\Component\Customer\Model\CustomerInterface">
             <join-column name="customer_id"/>
         </many-to-one>
