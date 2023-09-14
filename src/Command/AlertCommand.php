@@ -10,11 +10,12 @@ use Sylius\Component\Channel\Model\ChannelInterface;
 use Sylius\Component\Core\Model\ProductVariantInterface;
 use Sylius\Component\Inventory\Checker\AvailabilityCheckerInterface;
 use Sylius\Component\Mailer\Sender\SenderInterface;
-use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Webgriffe\SyliusBackInStockNotificationPlugin\Entity\SubscriptionInterface;
+use Webgriffe\SyliusBackInStockNotificationPlugin\Repository\SubscriptionRepositoryInterface;
 
 final class AlertCommand extends Command
 {
@@ -56,7 +57,8 @@ final class AlertCommand extends Command
     {
         $this
             ->setDescription('Send an email to the user if the product is returned in stock')
-            ->setHelp('Check the stock status of the products in the webgriffe_back_in_stock_notification table and send and email to the user if the product is returned in stock');
+            ->setHelp('Check the stock status of the products in the webgriffe_back_in_stock_notification table and send and email to the user if the product is returned in stock')
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -71,11 +73,12 @@ final class AlertCommand extends Command
                 $this->backInStockNotificationRepository->remove($subscription);
                 $this->logger->warning(
                     'The back in stock subscription for the product does not have all the information required',
-                    ['subscription' => var_export($subscription, true)]
+                    ['subscription' => var_export($subscription, true)],
                 );
 
                 continue;
             }
+
 
             if ($this->availabilityChecker->isStockAvailable($productVariant) && $productVariant->isEnabled() && $productVariant->getProduct()->isEnabled() ) {
                 $this->sendEmail($subscription, $productVariant, $channel);
@@ -89,8 +92,11 @@ final class AlertCommand extends Command
         return 0;
     }
 
-    private function sendEmail(SubscriptionInterface $subscription, ProductVariantInterface $productVariant, ChannelInterface $channel): void
-    {
+    private function sendEmail(
+        SubscriptionInterface $subscription,
+        ProductVariantInterface $productVariant,
+        ChannelInterface $channel,
+    ): void {
         $this->sender->send(
             'webgriffe_back_in_stock_notification_alert',
             [$subscription->getEmail()],
@@ -99,7 +105,9 @@ final class AlertCommand extends Command
                 'product' => $productVariant->getProduct(),
                 'channel' => $channel,
                 'localeCode' => $subscription->getLocaleCode(),
-            ]
+            ],
+            [],
+            [],
         );
     }
 }

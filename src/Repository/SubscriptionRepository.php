@@ -11,11 +11,12 @@ final class SubscriptionRepository extends EntityRepository implements Subscript
 {
     public function createByCustomerIdAndChannelIdQueryBuilder(int $customerId, int $channelId): QueryBuilder
     {
-        return $this->createQueryBuilder('subscription')
+        return $this
+            ->createQueryBuilder('subscription')
             ->andWhere('subscription.customer = :customerId')
             ->andWhere('subscription.channel = :channelId')
             ->setParameter('customerId', $customerId)
             ->setParameter('channelId', $channelId)
-            ;
+        ;
     }
 }
