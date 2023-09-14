@@ -184,6 +184,7 @@ final class SubscriptionController extends AbstractController
                         ['email' => $subscription->getEmail()],
                     ),
                 );
+            }
 
             if ($subscriptionSaved) {
                 if(!$subscriptionSaved->isNotify()) {
