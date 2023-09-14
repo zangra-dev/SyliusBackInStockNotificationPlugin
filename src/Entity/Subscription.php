@@ -101,7 +101,7 @@ class Subscription implements SubscriptionInterface
     {
         return $this->notify;
     }
-    
+
     public function setNotify(bool $notify): void
     {
         $this->notify = $notify;
