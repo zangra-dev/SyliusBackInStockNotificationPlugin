@@ -15,7 +15,7 @@
         "psr/log": "^2.0",
         "sylius/resource": "^1.8",
         "sylius/resource-bundle": "^1.8",
-        "sylius/sylius": "^1.12",
+        "sylius/sylius": "~1.11",
         "sylius/mailer-bundle": "^1.8 || ^2.0@beta",
         "symfony/webpack-encore-bundle": "^1.15",
         "symfony/config": "^5.4 || ^6.0",
