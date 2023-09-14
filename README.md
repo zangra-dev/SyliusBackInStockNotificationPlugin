@@ -28,12 +28,12 @@
 
 ## Requirements
 
-* PHP `^7.3`
-* Sylius `~1.8.0`
+* PHP `^8.0`
+* Sylius `^1.11.2`
 
 ## Installation
 
-1. Run `composer require webgriffe/sylius-back-in-stock-notification-plugin`.
+1. Run `composer require webgriffe/sylius-back-in-stock-notification-plugin --no-scripts`.
 
 2. Add the plugin to the `config/bundles.php` file:
 
@@ -45,38 +45,43 @@ Webgriffe\SyliusBackInStockNotificationPlugin\WebgriffeSyliusBackInStockNotifica
 
 ```yaml
 webgriffe_sylius_back_in_stock_notification_plugin:
-  resource: "@WebgriffeSyliusBackInStockNotificationPlugin/Resources/config/routing.yaml"
+  resource: "@WebgriffeSyliusBackInStockNotificationPlugin/config/routing.yaml"
 ```
 
-4. Import required config in your `config/packages/webgriffe_sylius_back_in_stock_notification_plugin.yaml` file:
+4. Import required packages config in your `config/packages/webgriffe_sylius_back_in_stock_notification_plugin.yaml` file:
 
 ```yaml
 imports:
-   - { resource: "@WebgriffeSyliusBackInStockNotificationPlugin/Resources/config/app/config.yaml" }
+   - { resource: "@WebgriffeSyliusBackInStockNotificationPlugin/config/packages.yaml" }
 ```
 
-5. Finish the installation by updating the database schema and installing assets:
+5. Update the database schema and install assets:
 
 ```bash
-bin/console doctrine:migrations:diff
 bin/console doctrine:migrations:migrate
 bin/console assets:install
 bin/console sylius:theme:assets:install
 ```
 
+6. Rebuild cache:
+
+```bash
+bin/console cache:clear
+bin/console cache:warmup
+```
+
 ## Configuration
 
-This module send mail using a Symfony Command. Unfortunately, the command line context does not know about your VirtualHost or domain name. To fix this, you need to configure the “request context”, which is a fancy way of saying that you need to configure your environment so that it knows what URL it should use when generating URLs. For further information you can see [Symfony Documentation](https://symfony.com/doc/2.6/cookbook/console/sending_emails.html).
+This module sends mail using a Symfony Command. Unfortunately, the command line context does not know about your VirtualHost or domain name. To fix this, the Command loads the hostname from the Subscription's channel, if nothing set it defaults to `localhost`. In console commands, URLs use http by default. You can change this globally with these configuration parameters:
 
 1. Edit the `config/services.yml` file by adding the following content:
 
 ```yaml
 parameters:
-    router.request_context.host: example.org
     router.request_context.scheme: https
 ```
 
-2. As said early this module provide a command that check the stock of the product. You have to set the command `bin/console webgriffe:back-in-stock-notification:alert` in the crontab, once a day is enough:
+2. As said early this module provides a command that check the stock of the product. You have to set the command `bin/console webgriffe:back-in-stock-notification:alert` in the crontab, once a day is enough:
 
 ```bash
 0 12 * * * <absolute-php-path> <absolute-path-to-sylius-dir>/bin/console webgriffe:back-in-stock-notification:alert
@@ -99,9 +104,12 @@ If you want to use our Behat defined steps you have to include our Behat class i
 To contribute to this plugin clone this repository, create a branch for your feature or bugfix, do your changes and then make sure al tests are passing.
 
 ```bash
+composer install
 (cd tests/Application && yarn install)
 (cd tests/Application && yarn build)
 (cd tests/Application && APP_ENV=test bin/console assets:install public)
+
+docker-compose up -d # only if you haven't mysql and mailhog installed locally 
 
 (cd tests/Application && APP_ENV=test bin/console doctrine:database:create)
 (cd tests/Application && APP_ENV=test bin/console doctrine:schema:create)
@@ -163,13 +171,13 @@ vendor/bin/psalm
 ##### PHPStan
 
 ```bash
-vendor/bin/phpstan analyse -c phpstan.neon -l max src/
+vendor/bin/phpstan analyse -c phpstan.neon
 ```
 
 ##### Coding Standard
 
 ```bash
-vendor/bin/ecs check src
+vendor/bin/ecs check
 ```
 
 ### Opening Sylius with your plugin
@@ -178,14 +186,14 @@ vendor/bin/ecs check src
 
 ```bash
 (cd tests/Application && APP_ENV=test bin/console sylius:fixtures:load)
-(cd tests/Application && APP_ENV=test bin/console server:run -d public)
+APP_ENV=test symfony server:start --port=8080 --dir=tests/Application/public --daemon
 ```
 
 - Using `dev` environment:
 
 ```bash
 (cd tests/Application && APP_ENV=dev bin/console sylius:fixtures:load)
-(cd tests/Application && APP_ENV=dev bin/console server:run -d public)
+APP_ENV=dev symfony server:start --dir=tests/Application/public --daemon
 ```
 
 ## License

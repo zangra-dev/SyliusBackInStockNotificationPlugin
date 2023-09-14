@@ -13,26 +13,21 @@ class Subscription implements SubscriptionInterface
 {
     use TimestampableTrait;
 
-    /** @var null|int */
-    private $id;
+    private ?int $id = null;
 
-    /** @var null|string */
-    private $hash;
+    private ?string $hash = null;
 
-    /** @var null|string */
-    private $email;
+    private ?string $email = null;
 
-    /** @var null|CustomerInterface */
-    private $customer;
+    private ?CustomerInterface $customer = null;
 
-    /** @var null|ProductVariantInterface */
-    private $productVariant;
+    private ?ProductVariantInterface $productVariant = null;
 
-    /** @var null|ChannelInterface */
-    private $channel;
+    private ?ChannelInterface $channel = null;
 
-    /** @var null|string */
-    private $localeCode;
+    private ?string $localeCode = null;
+
+    private bool $notify = false;
 
     /** @var bool */
     private $notify = false;

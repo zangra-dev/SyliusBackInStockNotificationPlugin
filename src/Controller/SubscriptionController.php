@@ -15,7 +15,6 @@ use Sylius\Component\Inventory\Checker\AvailabilityCheckerInterface;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
 use Sylius\Component\Mailer\Sender\SenderInterface;
 use Sylius\Component\Resource\Factory\FactoryInterface;
-use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,6 +24,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Webgriffe\SyliusBackInStockNotificationPlugin\Entity\SubscriptionInterface;
 use Webgriffe\SyliusBackInStockNotificationPlugin\Form\SubscriptionType;
+use Webgriffe\SyliusBackInStockNotificationPlugin\Repository\SubscriptionRepositoryInterface;
 
 final class SubscriptionController extends AbstractController
 {
@@ -116,7 +116,6 @@ final class SubscriptionController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var array $data */
             $data = $form->getData();
-            /** @var SubscriptionInterface $subscription */
             $subscription = $this->backInStockNotificationFactory->createNew();
 
             if (array_key_exists('email', $data)) {
@@ -170,8 +169,21 @@ final class SubscriptionController extends AbstractController
 
             $subscription->setProductVariant($variant);
             $subscriptionSaved = $this->backInStockNotificationRepository->findOneBy(
-                ['email' => $subscription->getEmail(), 'productVariant' => $subscription->getProductVariant()]
+                [
+                    'email' => $subscription->getEmail(),
+                    'productVariant' => $subscription->getProductVariant(),
+                    'notify' => false,
+                ],
             );
+
+            if ($subscriptionSaved !== null) {
+                $this->addFlash(
+                    'error',
+                    $this->translator->trans(
+                        'webgriffe_bisn.form_submission.already_saved',
+                        ['email' => $subscription->getEmail()],
+                    ),
+                );
 
             if ($subscriptionSaved) {
                 if(!$subscriptionSaved->isNotify()) {
@@ -183,13 +195,12 @@ final class SubscriptionController extends AbstractController
                                 'variant' => $variant->getCode(),]
                         )
                     );
-                    return $this->redirect($this->getRefererUrl($request));
                 } else {
                     $subscriptionSaved->setNotify(false);
                     $this->addFlash('success', $this->translator->trans('webgriffe_bisn.form_submission.subscription_successfully'));
                     $this->backInStockNotificationRepository->add($subscriptionSaved);
-                    return $this->redirect($this->getRefererUrl($request));
                 }
+                return $this->redirect($this->getRefererUrl($request));
             }
 
             $currentChannel = $this->channelContext->getChannel();
@@ -203,8 +214,11 @@ final class SubscriptionController extends AbstractController
                 //This way is easier and does not send sensible information
                 //see: https://paragonie.com/blog/2015/09/comprehensive-guide-url-parameter-encryption-in-php
                 $hash = strtr(base64_encode(random_bytes(9)), '+/', '-_');
-            } catch (Exception $e) {
-                $this->addFlash('error', $this->translator->trans('webgriffe_bisn.form_submission.subscription_failed'));
+            } catch (Exception) {
+                $this->addFlash(
+                    'error',
+                    $this->translator->trans('webgriffe_bisn.form_submission.subscription_failed'),
+                );
 
                 return $this->redirect($this->getRefererUrl($request));
             }
@@ -212,14 +226,17 @@ final class SubscriptionController extends AbstractController
 
             $this->backInStockNotificationRepository->add($subscription);
 
-            $this->addFlash('success', $this->translator->trans('webgriffe_bisn.form_submission.subscription_successfully'));
+            $this->addFlash(
+                'success',
+                $this->translator->trans('webgriffe_bisn.form_submission.subscription_successfully'),
+            );
 
             return $this->redirect($this->getRefererUrl($request));
         }
 
         return $this->render(
             '@WebgriffeSyliusBackInStockNotificationPlugin/productSubscriptionForm.html.twig',
-            ['form' => $form->createView()]
+            ['form' => $form->createView()],
         );
     }
 
@@ -227,13 +244,13 @@ final class SubscriptionController extends AbstractController
     {
         /** @var null|SubscriptionInterface $subscription */
         $subscription = $this->backInStockNotificationRepository->findOneBy(['hash' => $hash]);
-        if (null !== $subscription) {
-            $this->backInStockNotificationRepository->remove($subscription);
-            $this->addFlash('info', $this->translator->trans('webgriffe_bisn.deletion_submission.successful'));
+        if ($subscription === null) {
+            $this->addFlash('info', $this->translator->trans('webgriffe_bisn.deletion_submission.not-successful'));
 
             return $this->redirect($this->getRefererUrl($request));
         }
-        $this->addFlash('info', $this->translator->trans('webgriffe_bisn.deletion_submission.not-successful'));
+        $this->backInStockNotificationRepository->remove($subscription);
+        $this->addFlash('info', $this->translator->trans('webgriffe_bisn.deletion_submission.successful'));
 
         return $this->redirect($this->getRefererUrl($request));
     }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Webgriffe\SyliusBackInStockNotificationPlugin\Behat\Page\Shop\Account\Subscription;
@@ -10,13 +11,9 @@ use Symfony\Component\Routing\RouterInterface;
 
 final class IndexPage extends SymfonyPage implements IndexPageInterface
 {
-    /** @var TableAccessorInterface */
-    private $tableAccessor;
-
-    public function __construct(Session $session, $minkParameters, RouterInterface $router, TableAccessorInterface $tableAccessor)
+    public function __construct(Session $session, $minkParameters, RouterInterface $router, private TableAccessorInterface $tableAccessor)
     {
         parent::__construct($session, $minkParameters, $router);
-        $this->tableAccessor = $tableAccessor;
     }
 
     public function getRouteName(): string
