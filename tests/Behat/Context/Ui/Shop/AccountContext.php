@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Webgriffe\SyliusBackInStockNotificationPlugin\Behat\Context\Ui\Shop;
@@ -7,27 +8,18 @@ use Behat\Behat\Context\Context;
 use Sylius\Behat\NotificationType;
 use Sylius\Behat\Service\NotificationCheckerInterface;
 use Tests\Webgriffe\SyliusBackInStockNotificationPlugin\Behat\Page\Shop\Account\Subscription\IndexPageInterface;
-use Webgriffe\SyliusBackInStockNotificationPlugin\Entity\SubscriptionInterface;
 use Webmozart\Assert\Assert;
 
 final class AccountContext implements Context
 {
-    /** @var IndexPageInterface */
-    private $subscriptionIndexPage;
-
-    /** @var NotificationCheckerInterface */
-    private $notificationChecker;
-
-    public function __construct(IndexPageInterface $subscriptionIndexPage, NotificationCheckerInterface $notificationChecker)
+    public function __construct(private IndexPageInterface $subscriptionIndexPage, private NotificationCheckerInterface $notificationChecker)
     {
-        $this->subscriptionIndexPage = $subscriptionIndexPage;
-        $this->notificationChecker = $notificationChecker;
     }
 
     /**
      * @When /^I browse to my product subscriptions$/
      */
-    public function iBrowseToMyProductSubscriptions()
+    public function iBrowseToMyProductSubscriptions(): void
     {
         $this->subscriptionIndexPage->open();
     }
@@ -35,7 +27,7 @@ final class AccountContext implements Context
     /**
      * @When /^I delete the first subscription$/
      */
-    public function iDeleteTheFirstSubscription()
+    public function iDeleteTheFirstSubscription(): void
     {
         $this->subscriptionIndexPage->deleteFirstSubscription();
     }
@@ -43,7 +35,7 @@ final class AccountContext implements Context
     /**
      * @Then /^I should be notified that the subscription has been successfully deleted$/
      */
-    public function iShouldBeNotifiedThatTheSubscriptionHasBeenSuccessfullyDeleted()
+    public function iShouldBeNotifiedThatTheSubscriptionHasBeenSuccessfullyDeleted(): void
     {
         $this->notificationChecker->checkNotification('Mail is deleted from the notification alert list', NotificationType::info());
     }
@@ -51,7 +43,7 @@ final class AccountContext implements Context
     /**
      * @Then /^there should be no subscriptions$/
      */
-    public function thereShouldBeNoSubscriptions()
+    public function thereShouldBeNoSubscriptions(): void
     {
         Assert::true($this->subscriptionIndexPage->isPresentNoSubscriptionInfoMessage());
     }
@@ -59,7 +51,7 @@ final class AccountContext implements Context
     /**
      * @Then /^I should see only one subscription$/
      */
-    public function iShouldSeeOnlyOneSubscription()
+    public function iShouldSeeOnlyOneSubscription(): void
     {
         Assert::same($this->subscriptionIndexPage->countSubscriptions(), 1);
     }

@@ -20,6 +20,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Webgriffe\SyliusBackInStockNotificationPlugin\Entity\SubscriptionInterface;
+use Webgriffe\SyliusBackInStockNotificationPlugin\Repository\SubscriptionRepositoryInterface;
 
 final class AlertCommand extends Command
 {
@@ -72,7 +73,7 @@ final class AlertCommand extends Command
                 $this->backInStockNotificationRepository->remove($subscription);
                 $this->logger->warning(
                     'The back in stock subscription for the product does not have all the information required',
-                    ['subscription' => var_export($subscription, true)]
+                    ['subscription' => var_export($subscription, true)],
                 );
 
                 continue;

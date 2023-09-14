@@ -1,0 +1,45 @@
+webgriffe_bisn:
+    form_submission:
+        invalid_form: 'Error during form submitting, please try again'
+        invalid_email: 'Error during form submitting, please check email syntax (email)'
+        variant_not_found: 'Product not found, it is not possible to subscribe to notifications'
+        variant_not_oos: 'Product in stock, it is not possible to subscribe to notifications'
+        already_saved: 'Subscription with the mail email is already present for variant'
+        subscription_failed: 'Something goes wrong, please try again'
+        subscription_successfully: 'Successfully subscribed !'
+    deletion_submission:
+        not-successful: 'Subscription not found'
+        successful: 'Mail is deleted from the notification alert list'
+    my_account_section:
+        menu_label: 'Products notification'
+        title: 'Products notification'
+        sub_title: 'Manage your back in stock product notification'
+        empty_list: 'You have no active notifications.'
+        info_empty_list: 'Info'
+        product: 'Product'
+        option: 'Option'
+        remove: 'Remove'
+        actions: 'Action'
+        simple: 'Simple product'
+    product_page:
+        stock_notify_title: 'Get notified if this product<br>comes back in stock'
+        form_action: 'Notify me'
+    subscription_mail:
+        subscription_title: 'Product not available'
+        subscription_message: 'Your request has been registered, we will send you an email as soon as the product <a href="{url}">{product}</a> is back in stock.'
+        subscription_unsub: 'Were not you the one who subscribed to these notifications? <a href="{url}" target="_blank">Click here</a> to delete yourself.'
+    alert_email:
+        alert_title: 'Product back in stock'
+        alert_message: 'We inform you that the product <b>{product}</b> ({variantCode}) is back in stock'
+        alert_action: Don't miss out!
+    admin:
+        subscriptions_subtitle: 'Manage user subscriptions'
+        menu_label: 'Products notification'
+        delete_supscription: 'Delete Subscription'
+        show_product: 'Show Product'
+        show_customer: 'Show Customer'
+        notified: 'Notified'
+        not-notified: 'Not Notified'
+webgriffe:
+    ui:
+        back_in_stock_notification_subscriptions: 'Subscriptions'

@@ -1,0 +1,2 @@
+imports:
+    - { resource: "@WebgriffeSyliusBackInStockNotificationPlugin/config/packages.yaml" }
