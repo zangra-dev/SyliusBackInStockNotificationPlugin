@@ -1,5 +1,5 @@
 {
-    "name": "zangra/sylius-back-in-stock-notification-plugin",
+    "name": "webgriffe/sylius-back-in-stock-notification-plugin",
     "type": "sylius-plugin",
     "description": "Timely inform customers and guest visitors when a product return in stock",
     "keywords": [
