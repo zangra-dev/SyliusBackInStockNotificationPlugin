@@ -29,9 +29,6 @@ class Subscription implements SubscriptionInterface
 
     private bool $notify = false;
 
-    /** @var bool */
-    private $notify = false;
-
     public function getId(): ?int
     {
         return $this->id;
