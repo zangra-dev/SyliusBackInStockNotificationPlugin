@@ -34,6 +34,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
         }
     }
 
-    document.querySelector('#sylius-product-adding-to-cart').onchange = renderNotifyMeBtn
-    renderNotifyMeBtn()
+  document.querySelector('#trigger-notification-overlay').onclick = function() {
+    jQuery('#notification-overlay').modal('show')
+    document.querySelector('#back_in_stock_not input[type="hidden"]').value = getSelectedVariantCode()
+  }
+
+  document.querySelector('#sylius-product-adding-to-cart').onchange = renderNotifyMeBtn
+  renderNotifyMeBtn()
 })
