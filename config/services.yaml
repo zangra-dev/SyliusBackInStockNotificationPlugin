@@ -6,7 +6,8 @@ services:
             - '@sylius.email_sender'
             - '@sylius.availability_checker.default'
             - '@webgriffe.repository.back_in_stock_notification_subscription'
-            - '@router'
+            - '@mailer.mailer'
+            - '@doctrine.orm.entity_manager'
     
     Webgriffe\SyliusBackInStockNotificationPlugin\Controller\SubscriptionController:
         tags: [ 'controller.service_arguments' ]
@@ -23,6 +24,7 @@ services:
             - '@sylius.context.locale'
             - '@webgriffe.repository.back_in_stock_notification_subscription'
             - '@webgriffe.factory.back_in_stock_notification_subscription'
+            - '@sylius.repository.customer'
     
     Webgriffe\SyliusBackInStockNotificationPlugin\Menu\AccountMenuListener:
         tags:
