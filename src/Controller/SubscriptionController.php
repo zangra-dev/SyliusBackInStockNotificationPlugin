@@ -28,63 +28,22 @@ use Webgriffe\SyliusBackInStockNotificationPlugin\Repository\SubscriptionReposit
 
 final class SubscriptionController extends AbstractController
 {
-    /** @var RepositoryInterface */
-    private $backInStockNotificationRepository;
-
-    /** @var FactoryInterface */
-    private $backInStockNotificationFactory;
-
-    /** @var LocaleContextInterface */
-    private $localeContext;
-
-    /** @var SenderInterface */
-    private $sender;
-
-    /** @var ProductVariantRepositoryInterface */
-    private $productVariantRepository;
-
-    /** @var AvailabilityCheckerInterface */
-    private $availabilityChecker;
-
-    /** @var CustomerContextInterface */
-    private $customerContext;
-
-    /** @var ValidatorInterface */
-    private $validator;
-
-    /** @var TranslatorInterface */
-    private $translator;
-
-    /** @var ChannelContextInterface */
-    private $channelContext;
-
-    /** @var CustomerRepositoryInterface */
-    private $customerRepository;
-
+    /**
+     * @param FactoryInterface<SubscriptionInterface> $backInStockNotificationFactory
+     */
     public function __construct(
-        ChannelContextInterface $channelContext,
-        TranslatorInterface $translator,
-        ValidatorInterface $validator,
-        CustomerContextInterface $customerContext,
-        AvailabilityCheckerInterface $availabilityChecker,
-        ProductVariantRepositoryInterface $productVariantRepository,
-        SenderInterface $sender,
-        LocaleContextInterface $localeContext,
-        RepositoryInterface $backInStockNotificationRepository,
-        FactoryInterface $backInStockNotificationFactory,
-        CustomerRepositoryInterface $customerRepository
+        private ChannelContextInterface $channelContext,
+        private TranslatorInterface $translator,
+        private ValidatorInterface $validator,
+        private CustomerContextInterface $customerContext,
+        private AvailabilityCheckerInterface $availabilityChecker,
+        private ProductVariantRepositoryInterface $productVariantRepository,
+        private SenderInterface $sender,
+        private LocaleContextInterface $localeContext,
+        private SubscriptionRepositoryInterface $backInStockNotificationRepository,
+        private FactoryInterface $backInStockNotificationFactory,
+        private CustomerRepositoryInterface $customerRepository,
     ) {
-        $this->backInStockNotificationRepository = $backInStockNotificationRepository;
-        $this->backInStockNotificationFactory = $backInStockNotificationFactory;
-        $this->localeContext = $localeContext;
-        $this->sender = $sender;
-        $this->productVariantRepository = $productVariantRepository;
-        $this->availabilityChecker = $availabilityChecker;
-        $this->customerContext = $customerContext;
-        $this->validator = $validator;
-        $this->translator = $translator;
-        $this->channelContext = $channelContext;
-        $this->customerRepository = $customerRepository;
     }
 
     public function addAction(Request $request): Response
