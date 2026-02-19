@@ -25,10 +25,6 @@ services:
         tags:
             - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addAdminMenuItems }
     
-    Webgriffe\SyliusBackInStockNotificationPlugin\Twig\AvailabilityExtension:
-        tags:
-            - { name: twig.extension }
-    
     Webgriffe\SyliusBackInStockNotificationPlugin\Twig\AvailabilityRuntime:
         arguments:
             - '@sylius.availability_checker.default'
