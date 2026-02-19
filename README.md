@@ -14,20 +14,22 @@
 
 ### Subscribe to get a Notification when a product return in stock
 
-![Subscription for simple product](docs/product.png)
+![Subscription process for configurable product](subscriprion_process.gif)
+
+![Subscription for simple product](simple_product.png)
 
 ### View your subscriptions in the apposite section of your account
 
-![See the apposite section in the my account](docs/my_account_section.png)
+![See the apposite section in the my account](my_account_section.png)
 
 ### View your client subscriptions in the apposite admin section
 
-![See the apposite section in the admin account](docs/admin_account_section.png)
+![See the apposite section in the admin account](admin_account_section.png)
 
 ## Requirements
 
-* PHP `^8.2`
-* Sylius `^2.0`
+* PHP `^8.0`
+* Sylius `^1.11.2`
 
 ## Installation
 
@@ -61,7 +63,29 @@ bin/console assets:install
 bin/console sylius:theme:assets:install
 ```
 
-6. Clear cache:
+6. Install the plugin JS assets by adding the source to your webpack configuration:
+
+```js
+// Shop config
+Encore.setOutputPath('public/build/shop/')
+    .setPublicPath('/build/shop')
+    .addEntry('shop-entry', './vendor/sylius/sylius/src/Sylius/Bundle/ShopBundle/Resources/private/entry.js')
+    .addEntry('webgriffe-sylius-back-in-stock-notification-entry', './vendor/webgriffe/sylius-back-in-stock-notification-plugin/public/js/back-in-stock-notification.js') // The line to add
+    .disableSingleRuntimeChunk()
+    .cleanupOutputBeforeBuild()
+    .enableSourceMaps(!Encore.isProduction())
+    .enableVersioning(Encore.isProduction())
+    .enablePostCssLoader()
+    .enableSassLoader()
+```
+
+7. Run yarn build:
+
+```bash
+bin/console yarn:build
+```
+
+8. Clear cache:
 
 ```bash
 bin/console cache:clear
@@ -102,20 +126,17 @@ To contribute to this plugin clone this repository, create a branch for your fea
 
 ```bash
 composer install
-(cd vendor/sylius/test-application && yarn install)
-(cd vendor/sylius/test-application && yarn build)
-vendor/bin/console assets:install
+(cd tests/Application && yarn install)
+(cd tests/Application && yarn build)
+(cd tests/Application && APP_ENV=test bin/console assets:install public)
 
 docker-compose up -d # only if you haven't mysql and mailhog installed locally 
 
-vendor/bin/console doctrine:database:create
-vendor/bin/console doctrine:migrations:migrate -n
-# Optionally load data fixtures
-vendor/bin/console sylius:fixtures:load -n
-
-symfony server:ca:install
-symfony server:start -d
+(cd tests/Application && APP_ENV=test bin/console doctrine:database:create)
+(cd tests/Application && APP_ENV=test bin/console doctrine:schema:create)
 ```
+
+To be able to setup a plugin's database, remember to configure you database credentials in `tests/Application/.env` and `tests/Application/.env.test`.
 
 ### Running plugin tests
 
@@ -123,6 +144,12 @@ symfony server:start -d
 
 ```bash
 vendor/bin/phpunit
+```
+
+#### PHPSpec
+
+```bash
+vendor/bin/phpspec run
 ```
 
 #### Behat (non-JS scenarios)

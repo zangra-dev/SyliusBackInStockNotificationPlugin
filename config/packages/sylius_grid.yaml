@@ -1,7 +1,7 @@
 sylius_grid:
     templates:
         action:
-            customer_details: "@WebgriffeSyliusBackInStockNotificationPlugin/admin/subscription/grid/action/customer.html.twig"
+            customer_details: "@WebgriffeSyliusBackInStockNotificationPlugin/Admin/customerDetails.html.twig"
     
     grids:
         webgriffe_admin_notification_subscription:
@@ -15,9 +15,7 @@ sylius_grid:
                     label: sylius.ui.image
                     path: productVariant.product
                     options:
-                        template: "@SyliusAdmin/product/grid/field/product_image.html.twig"
-                        vars:
-                            th_class: "w-1"
+                        template: "@SyliusAdmin/Product/Grid/Field/image.html.twig"
                 product_variant_code:
                     type: string
                     label: sylius.ui.code
@@ -87,7 +85,7 @@ sylius_grid:
                     label: sylius.ui.product
                     path: productVariant
                     options:
-                        template: "@WebgriffeSyliusBackInStockNotificationPlugin/shop/account/subscription/grid/field/product.html.twig"
+                        template: "@WebgriffeSyliusBackInStockNotificationPlugin/MyAccount/productCell.html.twig"
                 product_variant_code:
                     type: string
                     label: sylius.ui.code
@@ -102,4 +100,4 @@ sylius_grid:
                     path: hash
                     label: sylius.ui.action
                     options:
-                        template: "@WebgriffeSyliusBackInStockNotificationPlugin/shop/account/subscription/grid/field/delete.html.twig"
+                        template: "@WebgriffeSyliusBackInStockNotificationPlugin/MyAccount/deleteCell.html.twig"

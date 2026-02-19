@@ -49,9 +49,9 @@ default:
             show_auto: false
 
         FriendsOfBehat\SymfonyExtension:
-            bootstrap: vendor/sylius/test-application/config/bootstrap.php
+            bootstrap: tests/Application/config/bootstrap.php
             kernel:
-                class: Sylius\TestApplication\Kernel
+                class: Tests\Webgriffe\SyliusBackInStockNotificationPlugin\Application\Kernel
 
         FriendsOfBehat\VariadicExtension: ~
 

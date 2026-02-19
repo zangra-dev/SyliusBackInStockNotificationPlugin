@@ -1,19 +1,16 @@
 /vendor/
-/var/
 /node_modules/
 /composer.lock
 
 /etc/build/*
 !/etc/build/.gitignore
 
-/tests/TestApplication/.env.local
-/tests/TestApplication/.env.test.local
-/tests/TestApplication/.env.*.local
+/tests/Application/yarn.lock
 
 /.phpunit.result.cache
 /behat.yml
+/phpspec.yml
 /phpunit.xml
 /docker-compose.override.yml
-/compose.override.yaml
 
 .phpunit.result.cache

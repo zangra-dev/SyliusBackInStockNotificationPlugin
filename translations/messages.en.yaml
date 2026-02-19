@@ -1,7 +1,3 @@
-webgriffe:
-    ui:
-        back_in_stock_notification_subscriptions: 'Products notification'
-
 webgriffe_bisn:
     form_submission:
         invalid_form: 'Error during form submitting, please try again'
@@ -44,3 +40,6 @@ webgriffe_bisn:
         show_customer: 'Show Customer'
         notified: 'Notified'
         not-notified: 'Not Notified'
+webgriffe:
+    ui:
+        back_in_stock_notification_subscriptions: 'Subscriptions'

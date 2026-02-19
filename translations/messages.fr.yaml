@@ -1,7 +1,3 @@
-webgriffe:
-    ui:
-        back_in_stock_notification_subscriptions: 'Notification de produits'
-
 webgriffe_bisn:
     form_submission:
         subscription_successfully: 'Inscription réussie, vérifiez votre e-mail !'

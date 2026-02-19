@@ -23,7 +23,7 @@ use App\Component\Mailer\MailService;
 
 #[AsCommand(
     name: 'webgriffe:back-in-stock-notification:alert',
-    description: 'Send an email to the user if the product is returned in stock',
+    description: 'Sends an email to users who subscribed to back-in-stock notifications when the product is available again.'
 )]
 final class AlertCommand extends Command
 {
@@ -36,14 +36,7 @@ final class AlertCommand extends Command
         private readonly EntityManagerInterface $entityManager,
         private readonly RouterInterface $router,
     ) {
-        parent::__construct($name);
-    }
-
-    protected function configure(): void
-    {
-        $this
-            ->setHelp('Check the stock status of the products in the webgriffe_back_in_stock_notification table and send and email to the user if the product is returned in stock')
-        ;
+        parent::__construct();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

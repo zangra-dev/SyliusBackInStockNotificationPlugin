@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <psalm
     errorLevel="1"
+    resolveFromConfigFile="true"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
@@ -13,26 +14,15 @@
     </projectFiles>
 
     <issueHandlers>
-        <MissingOverrideAttribute>
+        <PropertyNotSetInConstructor>
             <errorLevel type="suppress">
-                <directory name="src"/>
-                <directory name="src"/>
+                <referencedProperty name="Symfony\Bundle\FrameworkBundle\Controller\AbstractController::$container"/>
             </errorLevel>
-        </MissingOverrideAttribute>
-        <PossiblyUnusedMethod>
+        </PropertyNotSetInConstructor>
+        <DeprecatedMethod>
             <errorLevel type="suppress">
-                <directory name="src"/>
+                <referencedMethod name="Sylius\Component\Mailer\Sender\SenderInterface::send"/>
             </errorLevel>
-        </PossiblyUnusedMethod>
-        <UnusedClass>
-            <errorLevel type="suppress">
-                <directory name="src"/>
-            </errorLevel>
-        </UnusedClass>
-        <PossiblyUnusedProperty>
-            <errorLevel type="suppress">
-                <file name="src/Twig/Component/AddNotificationComponent.php"/>
-            </errorLevel>
-        </PossiblyUnusedProperty>
+        </DeprecatedMethod>
     </issueHandlers>
 </psalm>

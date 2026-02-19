@@ -9,9 +9,6 @@ use Sylius\Component\Core\Model\ProductVariantInterface;
 use Sylius\Component\Customer\Model\CustomerInterface;
 use Sylius\Component\Resource\Model\TimestampableTrait;
 
-/**
- * @psalm-suppress ClassMustBeFinal
- */
 class Subscription implements SubscriptionInterface
 {
     use TimestampableTrait;

@@ -30,7 +30,9 @@ final class ProductInventoryContext implements Context
         if ($productCode === null) {
             throw new RuntimeException('Could not load the product properly');
         }
-
+        if ($product->isConfigurable()) {
+            $this->subscriptionFormElement->openOverlayForConfigurableProduct();
+        }
         if ($email !== null) {
             $this->subscriptionFormElement->submitFormAsAGuest($productCode, $email);
         } else {

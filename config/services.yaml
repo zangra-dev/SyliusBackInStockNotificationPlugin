@@ -1,20 +1,21 @@
 services:
-    Webgriffe\SyliusBackInStockNotificationPlugin\Command\AlertCommand:
-        tags: [ 'console.command' ]
-        arguments:
-            - '@monolog.logger'
-            - '@sylius.email_sender'
-            - '@sylius.checker.inventory.availability'
-            - '@webgriffe.repository.back_in_stock_notification_subscription'
-            - '@router'
+    _defaults:
+        autowire: true
+        autoconfigure: true
+    
+    Webgriffe\SyliusBackInStockNotificationPlugin\Controller\:
+        resource: ../src/Controller/
     
     Webgriffe\SyliusBackInStockNotificationPlugin\Controller\SubscriptionController:
-        tags: [ 'controller.service_arguments' ]
-        calls:
-            - [ setContainer, [ '@service_container' ] ]
         arguments:
-            - '@translator'
-            - '@webgriffe.repository.back_in_stock_notification_subscription'
+            $backInStockNotificationFactory: '@webgriffe.factory.back_in_stock_notification_subscription'
+    
+    Webgriffe\SyliusBackInStockNotificationPlugin\Command\:
+        resource: ../src/Command/
+    
+    Webgriffe\SyliusBackInStockNotificationPlugin\Repository\SubscriptionRepositoryInterface:
+        alias: webgriffe.repository.back_in_stock_notification_subscription
+        public: false
     
     Webgriffe\SyliusBackInStockNotificationPlugin\Menu\AccountMenuListener:
         tags:
@@ -24,6 +25,16 @@ services:
         tags:
             - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addAdminMenuItems }
     
+    Webgriffe\SyliusBackInStockNotificationPlugin\Twig\AvailabilityExtension:
+        tags:
+            - { name: twig.extension }
+    
+    Webgriffe\SyliusBackInStockNotificationPlugin\Twig\AvailabilityRuntime:
+        arguments:
+            - '@sylius.availability_checker.default'
+        tags:
+            - { name: twig.runtime }
+    
     Webgriffe\SyliusBackInStockNotificationPlugin\Validator\SubscriptionUniqueValidator:
         arguments:
             - '@webgriffe.repository.back_in_stock_notification_subscription'
@@ -31,24 +42,3 @@ services:
             - '@sylius.context.customer'
         tags:
             - { name: validator.constraint_validator }
-
-    Webgriffe\SyliusBackInStockNotificationPlugin\Processor\SubscriptionProcessor:
-        arguments:
-            - '@webgriffe.factory.back_in_stock_notification_subscription'
-            - '@webgriffe.repository.back_in_stock_notification_subscription'
-            - '@sylius.context.channel.cached'
-            - '@sylius.context.locale'
-            - '@sylius.email_sender'
-
-    webgriffe.processor.subscription: '@Webgriffe\SyliusBackInStockNotificationPlugin\Processor\SubscriptionProcessor'
-
-    Webgriffe\SyliusBackInStockNotificationPlugin\Twig\Component\AddNotificationComponent:
-        arguments:
-            - '@form.factory'
-            - '@sylius.resolver.product_variant'
-            - '@sylius.context.customer'
-            - '@Webgriffe\SyliusBackInStockNotificationPlugin\Processor\SubscriptionProcessor'
-            - '@sylius.repository.product'
-            - '@sylius.repository.product_variant'
-        tags:
-            - { name: 'sylius.live_component.shop', key: 'webgriffe:sylius_shop:product:add_notification' }
