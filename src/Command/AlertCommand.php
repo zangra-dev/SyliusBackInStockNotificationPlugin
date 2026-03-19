@@ -36,7 +36,7 @@ final class AlertCommand extends Command
         private readonly EntityManagerInterface $entityManager,
         private readonly RouterInterface $router,
     ) {
-        parent::__construct($name);
+        parent::__construct();
     }
 
     protected function configure(): void
