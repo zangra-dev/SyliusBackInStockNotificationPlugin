@@ -6,8 +6,8 @@ services:
             - '@sylius.email_sender'
             - '@sylius.checker.inventory.availability'
             - '@webgriffe.repository.back_in_stock_notification_subscription'
-            - '@doctrine.orm.entity_manager'
             - '@mailer'
+            - '@doctrine.orm.entity_manager'
             - '@router'
     
     Webgriffe\SyliusBackInStockNotificationPlugin\Controller\SubscriptionController:
