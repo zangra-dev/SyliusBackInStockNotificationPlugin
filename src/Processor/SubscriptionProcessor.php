@@ -20,7 +20,6 @@ final class SubscriptionProcessor implements SubscriptionProcessorInterface
         private SubscriptionRepositoryInterface $backInStockNotificationRepository,
         private ChannelContextInterface $channelContext,
         private LocaleContextInterface $localeContext,
-        private SenderInterface $sender,
     ) {
     }
 
@@ -41,18 +40,17 @@ final class SubscriptionProcessor implements SubscriptionProcessorInterface
         );
 
         $this->backInStockNotificationRepository->add($subscription);
-        /** @psalm-suppress DeprecatedMethod */
-        $this->sender->send(
-            'webgriffe_back_in_stock_notification_success_subscription',
-            [$subscription->getEmail()],
-            [
-                'subscription' => $subscription,
-                'channel' => $subscription->getChannel(),
-                'localeCode' => $subscription->getLocaleCode(),
-            ],
-            [],
-            [],
-        );
+//        $this->sender->send(
+//            'webgriffe_back_in_stock_notification_success_subscription',
+//            [$subscription->getEmail()],
+//            [
+//                'subscription' => $subscription,
+//                'channel' => $subscription->getChannel(),
+//                'localeCode' => $subscription->getLocaleCode(),
+//            ],
+//            [],
+//            [],
+//        );
 
         return $subscription;
     }
