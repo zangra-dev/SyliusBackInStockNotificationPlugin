@@ -40,7 +40,6 @@ services:
             - '@webgriffe.repository.back_in_stock_notification_subscription'
             - '@sylius.context.channel.cached'
             - '@sylius.context.locale'
-            - '@sylius.email_sender'
 
     webgriffe.processor.subscription: '@Webgriffe\SyliusBackInStockNotificationPlugin\Processor\SubscriptionProcessor'
 
